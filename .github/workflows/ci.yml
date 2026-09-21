@@ -48,3 +48,14 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/booking-service:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/booking-service:${{ github.run_number}}
+
+  redeploy-to-railway:
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    container: ghcr.io/railwayapp/cli:latest
+    steps:
+      - name: Trigger Railway redeploy
+        run: railway redeploy --service niklas-bodega-booking-service --yes
+        env:
+          RAILWAY_TOKEN: ${{secrets.RAILWAY_TOKEN}}
